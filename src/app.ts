@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
@@ -14,7 +14,7 @@ interface Todo {
 let todos: Todo[] = [];
 
 app.get("/todos", (req: Request, res: Response) => {
-  res.json(todos);
+  res.status(200).json(todos);
 });
 
 app.post("/todos", (req: Request, res: Response) => {
@@ -27,14 +27,14 @@ app.post("/todos", (req: Request, res: Response) => {
   res.status(201).json(todo);
 });
 
-app.get("/todos/:id", (req: Request, res: Response) => {
+app.get("/todos/id/:id", (req: Request, res: Response) => {
   const todo = todos.find((t) => t.id === parseInt(req.params.id));
   if (!todo)
     return res.status(404).send("The todo with the given ID was not found.");
-  res.json(todo);
+  res.status(200).json(todo);
 });
 
-app.put("/todos/:id", (req: Request, res: Response) => {
+app.put("/todos/id/:id", (req: Request, res: Response) => {
   const todo = todos.find((t) => t.id === parseInt(req.params.id));
   if (!todo)
     return res.status(404).send("The todo with the given ID was not found.");
@@ -43,10 +43,10 @@ app.put("/todos/:id", (req: Request, res: Response) => {
   if (task !== undefined) todo.task = task;
   if (completed !== undefined) todo.completed = completed;
 
-  res.json(todo);
+  res.status(200).json(todo);
 });
 
-app.delete("/todos/:id", (req: Request, res: Response) => {
+app.delete("/todos/id/:id", (req: Request, res: Response) => {
   const index = todos.findIndex((t) => t.id === parseInt(req.params.id));
   if (index === -1)
     return res.status(404).send("The todo with the given ID was not found.");
@@ -66,7 +66,7 @@ app.get("/todos/filter/:status", (req: Request, res: Response) => {
   const filteredTodos = todos.filter((todo) =>
     status === "completed" ? todo.completed : !todo.completed
   );
-  res.json(filteredTodos);
+  res.status(200).json(filteredTodos);
 });
 
 app.get("/todos/search", (req: Request, res: Response) => {
@@ -78,9 +78,9 @@ app.get("/todos/search", (req: Request, res: Response) => {
   const searchResults = todos.filter((todo) =>
     todo.task.toLowerCase().includes((keyword as string).toLowerCase())
   );
-  res.json(searchResults);
+  res.status(200).json(searchResults);
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+app.use(express.json());
+
+export default app;
